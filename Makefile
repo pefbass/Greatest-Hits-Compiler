@@ -40,9 +40,9 @@ all:		${EXECBIN}
 ${EXECBIN}:	${OBJECTS}
 			${CPPWARN} -o${EXECBIN} ${OBJECTS}
 
-yylex.o:	yylex.cpp
-			@ # Suppress warning message from flex compilation.
-			${CPP} -Wno-sign-compare -c $<
+# yylex.o:	yylex.cpp
+# 			@ # Suppress warning message from flex compilation.
+# 			${CPP} -Wno-sign-compare -c $<
 
 # ${LEXCPP}:	${FLEXSRC}
 # 			${FLEX} ${FLEXSRC}
@@ -50,14 +50,14 @@ yylex.o:	yylex.cpp
 # ${PARSECPP} ${PARSEHDR}:	${BISONSRC}
 # 							${BISON} ${BISONSRC}
 
-clean:		- rm ${OBJECTS} ${REPORTS} ${DEPSFILE} core
-			- rm ${foreach test, ${TESTINS:.in=}, \
-					${patsubst %, ${test}.%, out err log}}
+clean:	
+			- rm ${OBJECTS} ${DEPSFILE}
 
 spotless:	clean
 			- rm ${EXECBIN}
 
-ci:			git add .
+ci:			
+			- git add .
 
 deps:		${CPPSRC}
 			@ echo "# ${DEPSFILE} created `date` by ${MAKE}" >${DEPSFILE}

@@ -1,3 +1,0 @@
-# Makefile.deps created Mon Apr 16 17:31:50 PDT 2018 by make
-stringset.o: stringset.cpp stringset.h
-oc.o: oc.cpp stringset.h
