@@ -114,9 +114,10 @@ int main (int argc, char** argv) {
 		exit(EXIT_FAILURE);
 	}
 
-	// Turn -D flag on, if included.
-	if(yy_flex_debug) fprintf(stderr, "-- popen(%s), fileno(pipe) = %d\n",
-								cmd.c_str(), fileno(pipe));
+	// Turn -ly flag on, if included.
+	if(yy_flex_debug || yydebug)
+		fprintf(stderr, "-- popen(%s), fileno(pipe) = %d\n",
+					cmd.c_str(), fileno(pipe));
 
 
 	// Read file and build stringset for it.
