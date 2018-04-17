@@ -2,7 +2,7 @@
  * Preston Fraser, pfraser
  * oc.cpp
  *
- * Compiler
+ * oc Compiler for CMPS-104A
  *****************************************************************************/
 
 #include <assert.h>
