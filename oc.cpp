@@ -11,15 +11,35 @@
 #include <unistd.h>
 #include <iostream>
 #include <fstream>
+#include <stdarg.h>
 
 #include "string.h"
 #include "stringset.h"
-#include "auxlib.h"
+//#include "auxlib.h"
+
+
+#ifdef NDEBUG
+// Do not generate any code.
+#define DEBUGF(FLAG,...)   /**/
+#define DEBUGSTMT(FLAG,STMTS) /**/
+#else
+// Generate debugging code.
+void __debugprintf (char flag, const char* file, int line,
+                    const char* func, const char* format, ...);
+#define DEBUGF(FLAG,...) \
+        __debugprintf (FLAG, __FILE__, __LINE__, __PRETTY_FUNCTION__, \
+                       __VA_ARGS__)
+#define DEBUGSTMT(FLAG,STMTS) \
+        if (is_debugflag (FLAG)) { DEBUGF (FLAG, "\n"); STMTS }
+#endif
 
 using namespace std;
 
 const string CPP = "/usr/bin/cpp ";
 constexpr size_t LINESIZE = 1024;
+const char* debugflags = "";
+bool alldebugflags = false;
+
 
 /*
 // Switch to debug mode for yylex().
@@ -32,6 +52,32 @@ void debug_yyparse(){
 	yydebug = 1;
 }
 */
+
+void set_debugflags (const char* flags) {
+   debugflags = flags;
+   assert (debugflags != nullptr);
+   if (strchr (debugflags, '@') != nullptr) alldebugflags = true;
+   DEBUGF ('x', "Debugflags = \"%s\", all = %d\n",
+           debugflags, alldebugflags);
+}
+
+bool is_debugflag (char flag) {
+   return alldebugflags or strchr (debugflags, flag) != nullptr;
+}
+
+void __debugprintf (char flag, const char* file, int line,
+                    const char* func, const char* format, ...) {
+   va_list args;
+   if (not is_debugflag (flag)) return;
+   fflush (nullptr);
+   va_start (args, format);
+   fprintf (stderr, "DEBUGF(%c): %s[%d] %s():\n",
+             flag, file, line, func);
+   vfprintf (stderr, format, args);
+   va_end (args);
+   fflush (nullptr);
+}
+
 
 // Chomp the last character from a buffer if it is delim.
 void chomp(char* c, char delim){
@@ -115,9 +161,8 @@ int main (int argc, char** argv) {
 	}
 
 	// Turn -ly flag on, if included.
-	if(yy_flex_debug || yydebug)
-		fprintf(stderr, "-- popen(%s), fileno(pipe) = %d\n",
-					cmd.c_str(), fileno(pipe));
+	if(yy_flex_debug) fprintf(stderr, "Debug mode for yylex() is on.\n");
+	if(yydebug) fprintf(stderr, "Debug mode for yyparse() is on.\n");
 
 
 	// Read file and build stringset for it.

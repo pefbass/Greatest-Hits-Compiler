@@ -57,8 +57,7 @@ clean:		- rm ${OBJECTS} ${REPORTS} ${DEPSFILE} core
 spotless:	clean
 			- rm ${EXECBIN}
 
-# Supposed to git check in
-ci:			ls
+ci:			git add .
 
 deps:		${CPPSRC}
 			@ echo "# ${DEPSFILE} created `date` by ${MAKE}" >${DEPSFILE}
