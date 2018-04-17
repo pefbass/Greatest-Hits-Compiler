@@ -15,8 +15,6 @@
 
 #include "string.h"
 #include "stringset.h"
-//#include "auxlib.h"
-
 
 #ifdef NDEBUG
 // Do not generate any code.
@@ -39,19 +37,6 @@ const string CPP = "/usr/bin/cpp ";
 constexpr size_t LINESIZE = 1024;
 const char* debugflags = "";
 bool alldebugflags = false;
-
-
-/*
-// Switch to debug mode for yylex().
-void debug_yylex(){
-	yy_flex_debug = 1;
-}
-
-// Switch to debug mode for yyparse().
-void debug_yyparse(){
-	yydebug = 1;
-}
-*/
 
 void set_debugflags (const char* flags) {
    debugflags = flags;
@@ -127,7 +112,7 @@ int main (int argc, char** argv) {
 	int yydebug = 0;
 
 	while((any_flags = getopt(argc, argv, "D:@:ly:")) != -1){
-		fprintf(stdout, "flag: %d\n", any_flags);
+		// fprintf(stdout, "flag: %d\n", any_flags);
 		if(any_flags == EOF) break;
 		switch(any_flags){
 			case 'D':	compflag = "-D " + (string) optarg + " ";	break;
@@ -148,7 +133,7 @@ int main (int argc, char** argv) {
 
 	if(yydebug) optind--;
 	string filename = argv[optind];
-	fprintf(stdout, "filename = %s\n", filename.c_str());
+	// fprintf(stdout, "filename = %s\n", filename.c_str());
 
 	// Verifying the file is of type ".oc".
 	if(filename.substr(filename.find_last_of(".") + 1) != "oc"){
@@ -167,7 +152,6 @@ int main (int argc, char** argv) {
 	// Turn -ly flag on, if included.
 	if(yy_flex_debug) fprintf(stderr, "Debug mode for yylex() is on.\n");
 	if(yydebug) fprintf(stderr, "Debug mode for yyparse() is on.\n");
-
 
 	// Read file and build stringset for it.
 	int f_len = filename.length();
