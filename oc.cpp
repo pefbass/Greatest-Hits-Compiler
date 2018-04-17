@@ -126,25 +126,29 @@ int main (int argc, char** argv) {
 	int yy_flex_debug = 0;
 	int yydebug = 0;
 
-	while((any_flags = getopt(argc, argv, "@:ly:D:")) != -1){
+	while((any_flags = getopt(argc, argv, "D:@:ly:")) != -1){
+		fprintf(stdout, "flag: %d\n", any_flags);
+		if(any_flags == EOF) break;
 		switch(any_flags){
+			case 'D':	compflag = "-D " + (string) optarg + " ";	break;
 			case '@':	set_debugflags(optarg);						break;
 			case 'l':	yy_flex_debug = 1;							break;
 			case 'y':	yydebug = 1;								break;
-			case 'D':	compflag = "-D " + (string) optarg + " ";	break;
 			default:
 				fprintf(stderr, "Flag not recognized: %c.\n", optopt);
 				exit(EXIT_FAILURE);
 		}
 	}
 
-	// Verifying a file is present.
-	if(optind >= argc){
-		fprintf(stderr, "No file found.\n");
+	// Verifying a file is present.pr
+	if(optind > argc){
+		fprintf(stderr, "No file found.", optind);
 		exit(EXIT_FAILURE);
 	}
 
+	if(yydebug) optind--;
 	string filename = argv[optind];
+	fprintf(stdout, "filename = %s\n", filename.c_str());
 
 	// Verifying the file is of type ".oc".
 	if(filename.substr(filename.find_last_of(".") + 1) != "oc"){
