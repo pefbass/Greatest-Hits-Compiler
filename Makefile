@@ -16,16 +16,16 @@ GRIND		= valgrind --leak-check=full --show-reachable=yes
 FLEX		= flex --outfile=${LEXCPP}
 BISON		= bison --defines=${PARSEHDR} --output=${PARSECPP}
 
-MODULES		= stringset
-HDRSRC		= ${MODULES}
+MODULES		= lyutils auxlib astree stringset
+HDRSRC		= ${MODULES:=.h}
 CPPSRC		= ${MODULES:=.cpp} oc.cpp
-FLEXSRC		= lexer.l
-# LEXCPP		= yylex.cpp
-# BISONSRC	= parser.y
-# PARSECPP	= yyparse.cpp
-# CGENS		= ${LEXCP} ${PARSECPP}
+FLEXSRC		= scanner.l
+LEXCPP		= yylex.cpp
+BISONSRC	= parser.y
+PARSECPP	= yyparse.cpp
+PARSEHDR	= yyparse.h
+# CGENS		= ${LEXCPP} ${PARSECPP}
 # ALLGENS		= ${PARSEHDR} ${CGENS}
-# PARSEHDR	= yyparse.h
 # ALLCSRC		= ${CPPSRC} ${CGENS}
 OBJECTS		= ${CPPSRC:.cpp=.o}
 LEXOUT		= yylex.output
@@ -40,15 +40,18 @@ all:		${EXECBIN}
 ${EXECBIN}:	${OBJECTS}
 			${CPPWARN} -o${EXECBIN} ${OBJECTS}
 
-# yylex.o:	yylex.cpp
-# 			@ # Suppress warning message from flex compilation.
-# 			${CPP} -Wno-sign-compare -c $<
+yylex.o:	yylex.cpp
+			# Suppress warning message from flex compilation.
+			${CPP} -Wno-sign-compare -c $<
 
-# ${LEXCPP}:	${FLEXSRC}
-# 			${FLEX} ${FLEXSRC}
+%.o : %.cpp
+			${CPP} -c $<
 
-# ${PARSECPP} ${PARSEHDR}:	${BISONSRC}
-# 							${BISON} ${BISONSRC}
+${LEXCPP}:	${FLEXSRC}
+			${FLEX} ${FLEXSRC}
+
+${PARSECPP} ${PARSEHDR}:	${BISONSRC}
+							${BISON} ${BISONSRC}
 
 clean:	
 			- rm ${OBJECTS} ${DEPSFILE}

@@ -13,56 +13,16 @@
 #include <fstream>
 #include <stdarg.h>
 
+#include "auxlib.h"
+#include "astree.h"
+#include "lyutils.h"
 #include "string.h"
 #include "stringset.h"
-
-#ifdef NDEBUG
-// Do not generate any code.
-#define DEBUGF(FLAG,...)   /**/
-#define DEBUGSTMT(FLAG,STMTS) /**/
-#else
-// Generate debugging code.
-void __debugprintf (char flag, const char* file, int line,
-                    const char* func, const char* format, ...);
-#define DEBUGF(FLAG,...) \
-        __debugprintf (FLAG, __FILE__, __LINE__, __PRETTY_FUNCTION__, \
-                       __VA_ARGS__)
-#define DEBUGSTMT(FLAG,STMTS) \
-        if (is_debugflag (FLAG)) { DEBUGF (FLAG, "\n"); STMTS }
-#endif
 
 using namespace std;
 
 const string CPP = "/usr/bin/cpp ";
 constexpr size_t LINESIZE = 1024;
-const char* debugflags = "";
-bool alldebugflags = false;
-
-void set_debugflags (const char* flags) {
-   debugflags = flags;
-   assert (debugflags != nullptr);
-   if (strchr (debugflags, '@') != nullptr) alldebugflags = true;
-   DEBUGF ('x', "Debugflags = \"%s\", all = %d\n",
-           debugflags, alldebugflags);
-}
-
-bool is_debugflag (char flag) {
-   return alldebugflags or strchr (debugflags, flag) != nullptr;
-}
-
-void __debugprintf (char flag, const char* file, int line,
-                    const char* func, const char* format, ...) {
-   va_list args;
-   if (not is_debugflag (flag)) return;
-   fflush (nullptr);
-   va_start (args, format);
-   fprintf (stderr, "DEBUGF(%c): %s[%d] %s():\n",
-             flag, file, line, func);
-   vfprintf (stderr, format, args);
-   va_end (args);
-   fflush (nullptr);
-}
-
 
 // Chomp the last character from a buffer if it is delim.
 void chomp(char* c, char delim){
@@ -100,6 +60,25 @@ void cpplines(FILE* pipe, const char* filename){
 	}
 }
 
+// Creating stringset dump file.
+void fdump_stringset(string rawname){
+	string trace = rawname + ".str";
+	ofstream trace_out;
+	trace_out.open(trace);
+	stringset::dump_stringset(&trace_out);
+	trace_out.close();
+}
+
+// Creating scanned token file. 
+void fscan_tok(string rawname, string cmd){
+	string trace = rawname + ".str";
+	ofstream trace_out;
+	trace_out.open(trace);
+	lexer::newfilename(cmd);
+	yyparse();
+	trace_out.close();
+}
+
 int main (int argc, char** argv) {
 
 	// Command: "oc [-ly] [-@flag ...] [-D string] program.oc"
@@ -108,8 +87,8 @@ int main (int argc, char** argv) {
 	int any_flags = 0;
 
 	// Setting default debug modes: OFF
-	int yy_flex_debug = 0;
-	int yydebug = 0;
+	yy_flex_debug = 0;
+	yydebug = 0;
 
 	while((any_flags = getopt(argc, argv, "D:@:ly:")) != -1){
 		// fprintf(stdout, "flag: %d\n", any_flags);
@@ -120,7 +99,7 @@ int main (int argc, char** argv) {
 			case 'l':	yy_flex_debug = 1;							break;
 			case 'y':	yydebug = 1;								break;
 			default:
-				fprintf(stderr, "Flag not recognized: %c.\n", optopt);
+				fprintf(stderr, "Flag not recognized: %c\n", optopt);
 				exit(EXIT_FAILURE);
 		}
 	}
@@ -141,10 +120,10 @@ int main (int argc, char** argv) {
 		exit(EXIT_FAILURE);
 	}
 
-	// Opening pipe with CPP compiler command.
+	// Opening external pipe, yyin, with CPP compiler command.
 	string cmd = CPP + compflag + filename;
-	FILE* pipe = popen(cmd.c_str(), "r");
-	if(pipe == NULL){
+	yyin = popen(cmd.c_str(), "r");
+	if(yyin == NULL){
 		fprintf(stderr, "%s: %s\n", cmd.c_str(), strerror(errno));
 		exit(EXIT_FAILURE);
 	}
@@ -157,18 +136,16 @@ int main (int argc, char** argv) {
 	int f_len = filename.length();
 	char c_filename[f_len + 1];
 	strcpy(c_filename, filename.c_str());
-	cpplines(pipe, c_filename);
+	cpplines(yyin, c_filename);
 
-	// Dump stringset into trace file with extension: .str
+	// Drop extension from filename.
 	string rawname = filename.substr(0, filename.size() - 3);
-	string trace = rawname + ".str";
-	ofstream trace_out;
-	trace_out.open(trace);
-	stringset::dump_stringset(&trace_out);
-	trace_out.close();
+
+	fdump_stringset(rawname);
+	fscan_tok(rawname, cmd);
 
 	// Closing the pipe.
-	if(pclose(pipe) != 0){
+	if(pclose(yyin) != 0){
 		fprintf(stderr, "Failed to close pipe.\n");
 		exit(EXIT_FAILURE);
 	}
