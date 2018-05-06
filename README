@@ -1,12 +1,10 @@
 README
 Preston Fraser, pfraser
 
-This submission includes my stringset ADT, oc compiler, and makefile. My
-stringset ADT borrows heavily from the provided one although I have modified
-dump_stringset() to accept a pointer to an open filestream instead of a file.
-oc.cpp borrows from the provided auxlib.h and .cpp file to accommodate the -@
-flag that can be run with the oc command.
+I was unable to get oc to work properly with multiple flags at once (-ly,
+-D string, and -@ flags). Use of oc is operational with one flag at a time.
 
-No bugs were found in this submission EXCEPT that I was unable to get oc to
-work properly with multiple flags at once (-ly, -D string, and -@ flags). Use
-of oc is operational with one flag at a time.
+With this specific submission, I was not able to get the tokens to actually
+print to the .tok file despite all of the printing code being present in the
+dump_node() function of astree.cpp. the newfilename() function for lexer
+does successfully print to the .tok file, though.

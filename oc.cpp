@@ -13,11 +13,11 @@
 #include <fstream>
 #include <stdarg.h>
 
+#include "stringset.h"
 #include "auxlib.h"
 #include "astree.h"
 #include "lyutils.h"
 #include "string.h"
-#include "stringset.h"
 
 using namespace std;
 
@@ -71,12 +71,15 @@ void fdump_stringset(string rawname){
 
 // Creating scanned token file. 
 void fscan_tok(string rawname, string cmd){
-	string trace = rawname + ".str";
-	ofstream trace_out;
-	trace_out.open(trace);
+	string fileout = rawname + ".tok";
+	out = fopen(fileout.c_str(), "w");
 	lexer::newfilename(cmd);
-	yyparse();
-	trace_out.close();
+	while(yylex() != YYEOF) {
+		yylval->dump_node(out);
+		fprintf(out, "\n");
+	}
+//	yyparse();
+	fclose(out);
 }
 
 int main (int argc, char** argv) {
@@ -104,7 +107,7 @@ int main (int argc, char** argv) {
 		}
 	}
 
-	// Verifying a file is present.pr
+	// Verifying a file is present.
 	if(optind > argc){
 		fprintf(stderr, "No file found.", optind);
 		exit(EXIT_FAILURE);
@@ -129,7 +132,10 @@ int main (int argc, char** argv) {
 	}
 
 	// Turn -ly flag on, if included.
-	if(yy_flex_debug) fprintf(stderr, "Debug mode for yylex() is on.\n");
+	if (yy_flex_debug) {
+		fprintf (stderr, "-- popen (%s), fileno(yyin) = %d\n",
+				cmd.c_str(), fileno (yyin));
+	}
 	if(yydebug) fprintf(stderr, "Debug mode for yyparse() is on.\n");
 
 	// Read file and build stringset for it.
@@ -141,14 +147,16 @@ int main (int argc, char** argv) {
 	// Drop extension from filename.
 	string rawname = filename.substr(0, filename.size() - 3);
 
-	fdump_stringset(rawname);
 	fscan_tok(rawname, cmd);
+	fdump_stringset(rawname);
 
 	// Closing the pipe.
 	if(pclose(yyin) != 0){
 		fprintf(stderr, "Failed to close pipe.\n");
 		exit(EXIT_FAILURE);
 	}
+
+	yylex_destroy();
 
 	exit(EXIT_SUCCESS);
 }

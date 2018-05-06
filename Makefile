@@ -18,18 +18,19 @@ BISON		= bison --defines=${PARSEHDR} --output=${PARSECPP}
 
 MODULES		= lyutils auxlib astree stringset
 HDRSRC		= ${MODULES:=.h}
-CPPSRC		= ${MODULES:=.cpp} oc.cpp
+CPPSRC		= ${MODULES:=.cpp} oc.cpp 
 FLEXSRC		= scanner.l
-LEXCPP		= yylex.cpp
 BISONSRC	= parser.y
-PARSECPP	= yyparse.cpp
 PARSEHDR	= yyparse.h
-# CGENS		= ${LEXCPP} ${PARSECPP}
-# ALLGENS		= ${PARSEHDR} ${CGENS}
-# ALLCSRC		= ${CPPSRC} ${CGENS}
-OBJECTS		= ${CPPSRC:.cpp=.o}
+LEXCPP		= yylex.cpp
+PARSECPP	= yyparse.cpp
+CGENS		= ${LEXCPP} ${PARSECPP}
+ALLGENS		= ${PARSEHDR} ${CGENS}
+ALLCSRC		= ${CPPSRC} ${CGENS}
+OBJECTS		= ${ALLCSRC:.cpp=.o}
 LEXOUT		= yylex.output
 PARSEOUT	= yyparse.output
+REPORTS		= ${LEXOUT} ${PARSEOUT}
 EXECBIN		= oc
 MODSRC		= ${foreach MOD, ${MODULES}, ${MOD}.h ${MOD}.cpp}
 MISCSRC		= ${filter-out ${MODSRC}, ${HDRSRC} ${CPPSRC}}
@@ -41,10 +42,12 @@ ${EXECBIN}:	${OBJECTS}
 			${CPPWARN} -o${EXECBIN} ${OBJECTS}
 
 yylex.o:	yylex.cpp
-			# Suppress warning message from flex compilation.
-			${CPP} -Wno-sign-compare -c $<
+			${CPPYY} -c $<
 
-%.o : %.cpp
+yyparse.o:	yyparse.cpp
+			${CPPYY} -c $<
+
+%.o:		%.cpp
 			${CPP} -c $<
 
 ${LEXCPP}:	${FLEXSRC}
@@ -54,7 +57,7 @@ ${PARSECPP} ${PARSEHDR}:	${BISONSRC}
 							${BISON} ${BISONSRC}
 
 clean:	
-			- rm ${OBJECTS} ${DEPSFILE}
+			- rm ${OBJECTS} ${DEPSFILE} ${ALLGENS} ${REPORTS}
 
 spotless:	clean
 			- rm ${EXECBIN}

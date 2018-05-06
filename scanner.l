@@ -11,10 +11,13 @@
 
 #define YY_USER_ACTION  { lexer::advance(); }
 
-#define VAL_TOKEN(SYMBOL) {								\
-   yylval = new astree (SYMBOL, lexer::lloc, yytext);	\
-   yylval->dump_node(out);								\
-   return SYMBOL;
+#define VAL_TOKEN(SYMBOL) { \
+   yylval = new astree (SYMBOL, lexer::lloc, yytext); \
+   fprintf(stdout, "before dump_node()\n"); \
+   yylval->dump_node(out); \
+   fprintf(stdout, "after dump_node()\n"); \
+   return SYMBOL; \
+}
 
 %}
 
@@ -25,6 +28,7 @@
 %option nounput
 %option noyywrap
 %option warn
+/*%option verbose*/
 
 LETTER          [A-Za-z_]
 DIGIT           [0-9]
@@ -61,11 +65,11 @@ NOTSTRING       ({STRINGUNCLOSED}|{STRINGBADESC})
 "void"          { VAL_TOKEN (TOK_VOID); }
 "new"           { VAL_TOKEN (TOK_NEW); }
 "null"          { VAL_TOKEN (TOK_NULL); }
-"not"          { VAL_TOKEN (TOK_NOT); }
+"not"           { VAL_TOKEN (TOK_NOT); }
 
 {NUMBER}        { VAL_TOKEN (TOK_INTCON); }
 {IDENT}         { VAL_TOKEN (TOK_IDENT); }
-{CHARCONST}     { VAL_TOKEN (TOK_CHARCON); }
+{CHARCON}       { VAL_TOKEN (TOK_CHARCON); }
 {STRINGCON}     { VAL_TOKEN (TOK_STRINGCON); }
 "+"             { VAL_TOKEN ('+'); }
 "-"             { VAL_TOKEN ('-'); }
