@@ -24,9 +24,9 @@ const string* lexer::filename (int filenr) {
 void lexer::newfilename (const string& filename) {
    lexer::lloc.filenr = lexer::filenames.size();
    lexer::filenames.push_back (filename);
-   fprintf(stdout, "Running newfilename()\n");
+   
    // Printing actual file.
-   fprintf(out, "# %d \"%s\"\n", lexer::lloc.filenr, filename.c_str());
+   fprintf(out, "# %-2zu \"%s\"\n", lexer::lloc.filenr, filename.c_str());
 }
 
 void lexer::advance() {

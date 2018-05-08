@@ -76,16 +76,13 @@ void fscan_tok(string rawname, string cmd){
 	lexer::newfilename(cmd);
 	while(yylex() != YYEOF) {
 		yylval->dump_node(out);
-		fprintf(out, "\n");
 	}
-//	yyparse();
-	fclose(out);
 }
 
 int main (int argc, char** argv) {
 
 	// Command: "oc [-ly] [-@flag ...] [-D string] program.oc"
-	const string execname = basename (argv[0]);
+	exec::execname = basename (argv[0]);
 	string compflag = "";
 	int any_flags = 0;
 
@@ -109,7 +106,7 @@ int main (int argc, char** argv) {
 
 	// Verifying a file is present.
 	if(optind > argc){
-		fprintf(stderr, "No file found.", optind);
+		fprintf(stderr, "No file found.\n");
 		exit(EXIT_FAILURE);
 	}
 
@@ -142,7 +139,7 @@ int main (int argc, char** argv) {
 	int f_len = filename.length();
 	char c_filename[f_len + 1];
 	strcpy(c_filename, filename.c_str());
-	cpplines(yyin, c_filename);
+//	cpplines(yyin, c_filename);
 
 	// Drop extension from filename.
 	string rawname = filename.substr(0, filename.size() - 3);

@@ -47,8 +47,7 @@ astree* astree::adopt_sym (astree* child, int symbol_) {
 void astree::dump_node (FILE* outfile) {
 
    // .tok file contents.
-   fprintf (outfile, "\ntesttesttest\n");
-   fprintf (outfile, "%-2zu %2zu.%03zu %3d %-15s (%s)\n",
+   fprintf (outfile, "  %-2zu %2zu.%03zu %3d %-15s (%s)\n",
             lloc.filenr, lloc.linenr, lloc.offset, symbol,
             parser::get_tname(symbol), lexinfo->c_str());
    for (size_t child = 0; child < children.size(); ++child) {

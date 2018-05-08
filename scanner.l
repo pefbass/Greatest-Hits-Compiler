@@ -13,9 +13,6 @@
 
 #define VAL_TOKEN(SYMBOL) { \
    yylval = new astree (SYMBOL, lexer::lloc, yytext); \
-   fprintf(stdout, "before dump_node()\n"); \
-   yylval->dump_node(out); \
-   fprintf(stdout, "after dump_node()\n"); \
    return SYMBOL; \
 }
 
@@ -65,7 +62,6 @@ NOTSTRING       ({STRINGUNCLOSED}|{STRINGBADESC})
 "void"          { VAL_TOKEN (TOK_VOID); }
 "new"           { VAL_TOKEN (TOK_NEW); }
 "null"          { VAL_TOKEN (TOK_NULL); }
-"not"           { VAL_TOKEN (TOK_NOT); }
 
 {NUMBER}        { VAL_TOKEN (TOK_INTCON); }
 {IDENT}         { VAL_TOKEN (TOK_IDENT); }
