@@ -3,6 +3,14 @@
 
 #include "oclib.h"
 
+struct teststruct{
+	int a;
+	int b;
+}
+
 int main() {
    putstr ("Hello, world!\n");
+   teststruct hi = new teststruct;
+   hi->a = 4;
+   hi->b = 56;
 }

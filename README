@@ -4,7 +4,4 @@ Preston Fraser, pfraser
 I was unable to get oc to work properly with multiple flags at once (-ly,
 -D string, and -@ flags). Use of oc is operational with one flag at a time.
 
-With this specific submission, I was not able to get the tokens to actually
-print to the .tok file despite all of the printing code being present in the
-dump_node() function of astree.cpp. the newfilename() function for lexer
-does successfully print to the .tok file, though.
+I was unable to find any bugs with my submission aside from the above.

@@ -74,9 +74,16 @@ void fscan_tok(string rawname, string cmd){
 	string fileout = rawname + ".tok";
 	out = fopen(fileout.c_str(), "w");
 	lexer::newfilename(cmd);
-	while(yylex() != YYEOF) {
-		yylval->dump_node(out);
-	}
+//	while(yylex() != YYEOF) {
+//		yylval->dump_node(out);
+//	}
+	yyparse();
+}
+
+void fdump_ast(string rawname){
+	string fileout = rawname + ".ast";
+	FILE* ast = fopen(fileout.c_str(), "w");
+	astree::print(ast, parser::root);
 }
 
 int main (int argc, char** argv) {
@@ -133,7 +140,7 @@ int main (int argc, char** argv) {
 		fprintf (stderr, "-- popen (%s), fileno(yyin) = %d\n",
 				cmd.c_str(), fileno (yyin));
 	}
-	if(yydebug) fprintf(stderr, "Debug mode for yyparse() is on.\n");
+	//if(yydebug) fprintf(stderr, "Debug mode for yyparse() is on.\n");
 
 	// Read file and build stringset for it.
 	int f_len = filename.length();
@@ -146,6 +153,7 @@ int main (int argc, char** argv) {
 
 	fscan_tok(rawname, cmd);
 	fdump_stringset(rawname);
+	fdump_ast(rawname);
 
 	// Closing the pipe.
 	if(pclose(yyin) != 0){

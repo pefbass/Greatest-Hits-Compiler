@@ -11,8 +11,12 @@
 
 #define YY_USER_ACTION  { lexer::advance(); }
 
+// Abstract syntax tree built while scanning the entire program.
+// It will additionally enter all tokens into the out file declared
+// externally to this file.
 #define VAL_TOKEN(SYMBOL) { \
    yylval = new astree (SYMBOL, lexer::lloc, yytext); \
+   yylval->dump_node(out); \
    return SYMBOL; \
 }
 
