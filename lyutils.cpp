@@ -65,7 +65,7 @@ void lexer::include() {
    int scan_rc = sscanf (yytext, "# %zd \"%[^\"]\"", &linenr, filename);
    if (scan_rc != 2) {
       errprintf ("%s: invalid directive, ignored\n", yytext);
-   }else {
+   } else {
       if (yy_flex_debug) {
          fprintf (stderr, "--included # %zd \"%s\"\n",
                   linenr, filename);

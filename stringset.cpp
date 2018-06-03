@@ -27,9 +27,9 @@ stringset set;
 const string* stringset::intern_stringset (const char* c){
 
 	string s = c;
-
 	auto pair = set.insert(s);
-	return &(*pair.first);
+	auto iter = pair.first;
+	return &(*iter);
 }
 
 // Dumps out the string set in debug format. In other words, print the hash
@@ -55,9 +55,9 @@ void stringset::dump_stringset (ofstream* out){
 		for(auto i = set.cbegin(bucket); i != set.cend(bucket); ++i){
 
 			if(need_index){
-				*out << "hash[" << setw(4) << bucket << "]: ";
+				*out << "hash[" << setw(3) << bucket << "]: ";
 			} else {
-				*out << "             ";
+				*out << "           ";
 			}
 
 			need_index = false;

@@ -1,5 +1,7 @@
 # $Id: Makefile,v 1.23 2016-10-12 16:59:53-07 - - $
 
+# submit cmps104a-wm.s18 asg4 astree.cpp astree.h auxlib.cpp auxlib.h lyutils.cpp lyutils.h Makefile oc.cpp parser.y README scanner.l stringset.cpp stringset.h symtable.cpp symtable.h typechecker.cpp typechecker.h
+
 DEPSFILE  = Makefile.deps
 NOINCLUDE = ci clean spotless
 NEEDINCL  = ${filter ${NOINCLUDE}, ${MAKECMDGOALS}}
@@ -9,7 +11,7 @@ GRIND     = valgrind --leak-check=full --show-reachable=yes
 FLEX      = flex --outfile=${LEXCPP}
 BISON     = bison --defines=${PARSEHDR} --output=${PARSECPP} --xml
 
-MODULES   = astree lyutils stringset auxlib
+MODULES   = astree lyutils stringset auxlib symtable typechecker emitter
 HDRSRC    = ${MODULES:=.h}
 CPPSRC    = ${MODULES:=.cpp} oc.cpp
 FLEXSRC   = scanner.l
@@ -18,7 +20,7 @@ PARSEHDR  = yyparse.h
 LEXCPP    = yylex.cpp
 PARSECPP  = yyparse.cpp
 CGENS     = ${LEXCPP} ${PARSECPP}
-ALLGENS   = ${CGENS}
+ALLGENS   = ${PARSEHDR} ${CGENS}
 EXECBIN   = oc
 ALLCSRC   = ${CPPSRC} ${CGENS}
 OBJECTS   = ${ALLCSRC:.cpp=.o}

@@ -4,4 +4,8 @@ Preston Fraser, pfraser
 I was unable to get oc to work properly with multiple flags at once (-ly,
 -D string, and -@ flags). Use of oc is operational with one flag at a time.
 
-I was unable to find any bugs with my submission aside from the above.
+Symbol Table:
+The elements from included files are not recognized and insitgate segmentation
+faults. When unused, the .oc file inputs are compatible with the compiler.
+
+test6 segfaults at emitter.

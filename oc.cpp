@@ -2,7 +2,7 @@
  * Preston Fraser, pfraser
  * oc.cpp
  *
- * oc Compiler for CMPS-104A
+ * oc Compiler
  *****************************************************************************/
 
 #include <assert.h>
@@ -13,11 +13,14 @@
 #include <fstream>
 #include <stdarg.h>
 
+#include "string.h"
 #include "stringset.h"
 #include "auxlib.h"
 #include "astree.h"
 #include "lyutils.h"
-#include "string.h"
+#include "symtable.h"
+#include "typechecker.h"
+#include "emitter.h"
 
 using namespace std;
 
@@ -86,6 +89,21 @@ void fdump_ast(string rawname){
 	astree::print(ast, parser::root);
 }
 
+void fcreate_sym_table(string rawname){
+	string fileout = rawname + ".sym";
+	FILE* sym = fopen(fileout.c_str(), "w");
+	vector<symtable*> sym_stack;
+	sym_stack.push_back(nullptr);
+	symtable structs;
+	symbol::parse_astree(sym, sym_stack, structs, parser::root);
+}
+
+void femit_lang(string rawname){
+	string fileout = rawname + ".oil";
+	FILE* oil = fopen(fileout.c_str(), "w");
+	emitter::emit(oil, parser::root);
+}
+
 int main (int argc, char** argv) {
 
 	// Command: "oc [-ly] [-@flag ...] [-D string] program.oc"
@@ -143,17 +161,20 @@ int main (int argc, char** argv) {
 	//if(yydebug) fprintf(stderr, "Debug mode for yyparse() is on.\n");
 
 	// Read file and build stringset for it.
-	int f_len = filename.length();
-	char c_filename[f_len + 1];
-	strcpy(c_filename, filename.c_str());
-//	cpplines(yyin, c_filename);
+	//int f_len = filename.length();
+	//char c_filename[f_len + 1];
+	//strcpy(c_filename, filename.c_str());
+	//cpplines(yyin, c_filename);
 
 	// Drop extension from filename.
 	string rawname = filename.substr(0, filename.size() - 3);
 
 	fscan_tok(rawname, cmd);
 	fdump_stringset(rawname);
+	fcreate_sym_table(rawname);
+	check_type(parser::root);
 	fdump_ast(rawname);
+	//femit_lang(rawname);
 
 	// Closing the pipe.
 	if(pclose(yyin) != 0){

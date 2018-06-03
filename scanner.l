@@ -14,8 +14,8 @@
 // Abstract syntax tree built while scanning the entire program.
 // It will additionally enter all tokens into the out file declared
 // externally to this file.
-#define VAL_TOKEN(SYMBOL) { \
-   yylval = new astree (SYMBOL, lexer::lloc, yytext); \
+#define VAL_TOKEN(SYMBOL){ \
+   yylval = new astree(SYMBOL, lexer::lloc, yytext); \
    yylval->dump_node(out); \
    return SYMBOL; \
 }
@@ -84,9 +84,9 @@ NOTSTRING       ({STRINGUNCLOSED}|{STRINGBADESC})
 "<="            { VAL_TOKEN (TOK_LE); }
 ">"             { VAL_TOKEN (TOK_GT); }
 ">="            { VAL_TOKEN (TOK_GE); }
-"->"            { VAL_TOKEN (TOK_ARROW); }
 ","             { VAL_TOKEN (','); }
 "."             { VAL_TOKEN ('.'); }
+"->"            { VAL_TOKEN (TOK_ARROW); }
 ";"             { VAL_TOKEN (';'); }
 "("             { VAL_TOKEN ('('); }
 ")"             { VAL_TOKEN (')'); }

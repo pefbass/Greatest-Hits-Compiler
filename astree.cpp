@@ -31,21 +31,41 @@ astree::~astree() {
    }
 }
 
+// For creating a duplicate of the astree a.
+astree::astree(astree* a){
+   symbol = a->symbol;
+   lloc = a->lloc;
+   lexinfo = a->lexinfo;
+
+   for(auto c: a->children){
+      auto child = new astree(c);
+      children.push_back(child);
+   }
+}
+
 astree* astree::adopt (astree* child1, astree* child2) {
-   if (child1 != nullptr) children.push_back (child1);
-   if (child2 != nullptr) children.push_back (child2);
+   if(child1 != nullptr) children.push_back(child1);
+   if(child2 != nullptr) children.push_back(child2);
    return this;
 }
 
 // Optional to supply second child.
-astree* astree::adopt_sym (astree* child1, int symbol_, astree* child2) {
+astree* astree::adopt_sym (astree* child, int symbol_) {
    symbol = symbol_;
-   return adopt (child1, child2);
+   return adopt(child);
+}
+
+astree* astree::adopt2_sym (astree* child1, astree* child2, int symbol_) {
+   symbol = symbol_;
+   return adopt(child1, child2);
 }
 
 astree* astree::adopt_children(astree* a){
 
-   for(auto c: a->children) children.push_back(c);
+   for(auto c: a->children){
+      auto child = new astree(c);
+      children.push_back(child);
+   }
    return this;
 }
 
@@ -61,7 +81,8 @@ astree* astree::make_root(int symbol_){
    return new astree(symbol_, {0,0,0}, "");
 }
 
-astree* astree::make_fn_tree(astree* identdecl, astree* params, astree* block, int prototype, int fn){
+astree* astree::make_fn_tree(astree* identdecl, astree* params,
+   astree* block, int prototype, int fn){
 
    astree* fn_tree;
 
@@ -80,14 +101,16 @@ astree* astree::make_fn_tree(astree* identdecl, astree* params, astree* block, i
 
 // Handling structs. ----------------------------
 
-astree* astree::struct_no_arg(astree* ident, astree* lbracket, astree* rbracket, int symbol_){
+astree* astree::struct_no_arg(astree* ident, astree* lbracket,
+   astree* rbracket, int symbol_){
 
    destroy(lbracket, rbracket);
    ident->symbol = symbol_;
    return adopt(ident);
 }
 
-astree* astree::struct_arg(astree* ident, astree* lbracket, astree* statement, astree* scolon, astree* rbracket, int symbol_){
+astree* astree::struct_arg(astree* ident, astree* lbracket, astree* statement,
+   astree* scolon, astree* rbracket, int symbol_){
 
    destroy(lbracket, scolon);
    destroy(rbracket);
@@ -95,7 +118,8 @@ astree* astree::struct_arg(astree* ident, astree* lbracket, astree* statement, a
    return adopt(ident, statement);
 }
 
-astree* astree::struct_args(astree* ident, astree* lbracket, astree* fdeclarray, astree* rbracket, int symbol_){
+astree* astree::struct_args(astree* ident, astree* lbracket,
+   astree* fdeclarray, astree* rbracket, int symbol_){
 
    destroy(lbracket, rbracket);
    ident->symbol = symbol_;
@@ -107,34 +131,48 @@ astree* astree::struct_args(astree* ident, astree* lbracket, astree* fdeclarray,
 
 // ---------------------------------------
 
-astree* astree::fn(astree* lparen, astree* rparen, astree* block, int symbol_, int prototype, int fn){
+astree* astree::fn(astree* lparen, astree* rparen, astree* block, int symbol_,
+   int prototype, int fn){
 
    destroy(rparen);
    lparen->symbol = symbol_;
    return astree::make_fn_tree(this, lparen, block, prototype, fn);
 }
 
-astree* astree::adopt_child_sym(int symbol_, astree* ldelim, astree* rdelim, astree* child1, astree* child2){
+astree* astree::adopt_child_sym(int symbol_, astree* ldelim, astree* rdelim,
+   astree* child1, astree* child2){
 
    destroy(ldelim, rdelim);
    child1->symbol = symbol_;
+   if(symbol_ == TOK_ARRAY) fprintf(stdout, "\nARRAY!\n");
    return adopt(child1, child2);
 }
 
 // Optional to supply second trash and child.
-astree* astree::destroy_adopt(astree* trash1, astree* child1, astree* child2, astree* trash2){
+astree* astree::destroy_adopt(astree* trash, astree* child1, astree* child2){
+
+   destroy(trash);
+   return adopt(child1, child2);
+}
+
+astree* astree::destroy2_adopt(astree* trash1, astree* trash2, astree* child1,
+   astree* child2){
 
    destroy(trash1, trash2);
    return adopt(child1, child2);
 }
 
-astree* astree::destroy_adopt_sym(astree* trash, int symbol_, astree* child1, astree* child2){
+astree* astree::destroy_adopt_sym(astree* trash, int symbol_, astree* child1,
+   astree* child2){
 
+   destroy(trash);
    symbol = symbol_;
-   return destroy_adopt(trash, child1, child2);
+   return adopt(child1, child2);
 }
 
-astree* astree::destroy3_adopt3_sym(astree* trash1, astree* trash2, astree* trash3, int symbol_, astree* child1, astree* child2, astree* child3){
+astree* astree::destroy3_adopt3_sym(astree* trash1, astree* trash2,
+   astree* trash3, int symbol_, astree* child1, astree* child2,
+   astree* child3){
 
    destroy(trash1, trash2);
    destroy(trash3);
@@ -143,7 +181,7 @@ astree* astree::destroy3_adopt3_sym(astree* trash1, astree* trash2, astree* tras
    return adopt(child3);
 }
 
-astree* astree::adopt2_child_sym(int symbol_, astree* child1, astree* child2){
+astree* astree::adopt_child2_sym(int symbol_, astree* child1, astree* child2){
 
    child2->symbol = symbol_;
    return adopt(child1, child2);
@@ -179,17 +217,25 @@ void astree::dump (FILE* outfile, astree* tree) {
                    else tree->dump_node (outfile);
 }
 
-void astree::print (FILE* outfile, astree* tree, int depth) {
+void astree::print(FILE* outfile, astree* tree, int depth){
 
-   //fprintf (outfile, "%*s", depth * 3, "");
-   for(int i = 0; i < depth; i++){
-      fprintf (outfile, "|   ");
-   }
+   string s = "";
+   if(tree->sym_attrs) s = tree->sym_attrs->get_attrs();
+
    const char *tname = parser::get_tname (tree->symbol);
    if(strstr(tname, "TOK_") == tname) tname += 4;
-   fprintf (outfile, "%s \"%s\" %zd.%zd.%zd\n",
-            tname, tree->lexinfo->c_str(),
-            tree->lloc.filenr, tree->lloc.linenr, tree->lloc.offset);
+   fprintf(outfile, "; %*s", depth * 3, "");
+   fprintf (outfile, "%s \"%s\" (%zd.%zd.%zd) %s",
+            tname, tree->lexinfo->c_str(), tree->lloc.filenr,
+            tree->lloc.linenr, tree->lloc.offset, s.c_str());
+   if(tree->symbol == TOK_IDENT ||  tree->symbol == TOK_FUNCTION
+      || tree->symbol == TOK_TYPEID || tree->symbol == TOK_FIELD){
+      if(tree->sym_attrs)
+         fprintf(outfile, "(%zd.%zd.%zd)", tree->sym_attrs->lloc->filenr,
+               tree->sym_attrs->lloc->linenr, tree->sym_attrs->lloc->offset);
+   }
+   fprintf(outfile, "\n");
+
    for (astree* child: tree->children) {
       astree::print (outfile, child, depth + 1);
    }
@@ -206,6 +252,6 @@ void errllocprintf (const location& lloc, const char* format,
    assert (sizeof buffer > strlen (format) + strlen (arg));
    snprintf (buffer, sizeof buffer, format, arg);
    errprintf ("%s:%zd.%zd: %s", 
-              lexer::filename (lloc.filenr), lloc.linenr, lloc.offset,
-              buffer);
+              (*lexer::filename(lloc.filenr)).c_str(),
+              lloc.linenr, lloc.offset, buffer);
 }
