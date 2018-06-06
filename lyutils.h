@@ -1,11 +1,9 @@
-// $Id: lyutils.h,v 1.10 2016-10-06 16:42:53-07 - - $
+// $Id: lyutils.h,v 1.11 2017-10-11 14:19:04-07 - - $
 
 #ifndef __UTILS_H__
 #define __UTILS_H__
 
 // Lex and Yacc interface utility.
-
-#define YYEOF 0
 
 #include <string>
 #include <vector>
@@ -15,6 +13,8 @@ using namespace std;
 
 #include "astree.h"
 #include "auxlib.h"
+
+#define YYEOF 0
 
 extern FILE* out;
 extern FILE* yyin;
@@ -47,7 +47,8 @@ struct parser {
    static const char* get_tname (int symbol);
 };
 
-#define YYSTYPE astree*
+#define YYSTYPE_IS_DECLARED
+typedef astree* YYSTYPE;
 #include "yyparse.h"
 
 #endif

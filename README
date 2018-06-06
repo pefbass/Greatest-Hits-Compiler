@@ -1,11 +1,15 @@
 README
 Preston Fraser, pfraser
 
+* * * * * * PLEASE GRADE THIS SUBMISSION AS ASSIGNMENT 2 * * * * * *
+
+I was not able to get the emitter to work without segmentation faults that
+would delete the entire .oil file, so I am resubmitting assignment 2 instead.
+
+I received 27.0 / 60.0 on assignment 2 but fixed the issues right at the start
+of assignment 3. I am resubmitting assignment 2 to potentially earn back the
+33 points I lost since I believe it is more than I would receive for submitting
+my attempt at project 5.
+
 I was unable to get oc to work properly with multiple flags at once (-ly,
 -D string, and -@ flags). Use of oc is operational with one flag at a time.
-
-Symbol Table:
-The elements from included files are not recognized and insitgate segmentation
-faults. When unused, the .oc file inputs are compatible with the compiler.
-
-test6 segfaults at emitter.

@@ -16,7 +16,6 @@
 // externally to this file.
 #define VAL_TOKEN(SYMBOL){ \
    yylval = new astree(SYMBOL, lexer::lloc, yytext); \
-   yylval->dump_node(out); \
    return SYMBOL; \
 }
 

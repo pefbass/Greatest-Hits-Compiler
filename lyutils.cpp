@@ -9,11 +9,11 @@
 #include "auxlib.h"
 #include "lyutils.h"
 
+FILE* out;
 bool lexer::interactive = true;
 location lexer::lloc = {0, 1, 0};
 size_t lexer::last_yyleng = 0;
 vector<string> lexer::filenames;
-FILE* out;
 
 astree* parser::root = nullptr;
 
@@ -24,12 +24,14 @@ const string* lexer::filename (int filenr) {
 void lexer::newfilename (const string& filename) {
    lexer::lloc.filenr = lexer::filenames.size();
    lexer::filenames.push_back (filename);
-   
+
    // Printing actual file.
    fprintf(out, "# %-2zu \"%s\"\n", lexer::lloc.filenr, filename.c_str());
 }
 
 void lexer::advance() {
+   int a = YYEOF;
+   printf("%d\n", a);
    if (not interactive) {
       if (lexer::lloc.offset == 0) {
          printf (";%2zd.%3zd: ",
@@ -65,7 +67,7 @@ void lexer::include() {
    int scan_rc = sscanf (yytext, "# %zd \"%[^\"]\"", &linenr, filename);
    if (scan_rc != 2) {
       errprintf ("%s: invalid directive, ignored\n", yytext);
-   } else {
+   }else {
       if (yy_flex_debug) {
          fprintf (stderr, "--included # %zd \"%s\"\n",
                   linenr, filename);

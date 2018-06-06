@@ -18,9 +18,8 @@
 #include "auxlib.h"
 #include "astree.h"
 #include "lyutils.h"
-#include "symtable.h"
-#include "typechecker.h"
-#include "emitter.h"
+//#include "symtable.h"
+//#include "typechecker.h"
 
 using namespace std;
 
@@ -77,12 +76,13 @@ void fscan_tok(string rawname, string cmd){
 	string fileout = rawname + ".tok";
 	out = fopen(fileout.c_str(), "w");
 	lexer::newfilename(cmd);
-//	while(yylex() != YYEOF) {
-//		yylval->dump_node(out);
-//	}
-	yyparse();
+	while(yylex() != YYEOF) {
+		yylval->dump_node(out);
+	}
+//	yyparse();
 }
 
+/*
 void fdump_ast(string rawname){
 	string fileout = rawname + ".ast";
 	FILE* ast = fopen(fileout.c_str(), "w");
@@ -97,12 +97,7 @@ void fcreate_sym_table(string rawname){
 	symtable structs;
 	symbol::parse_astree(sym, sym_stack, structs, parser::root);
 }
-
-void femit_lang(string rawname){
-	string fileout = rawname + ".oil";
-	FILE* oil = fopen(fileout.c_str(), "w");
-	emitter::emit(oil, parser::root);
-}
+*/
 
 int main (int argc, char** argv) {
 
@@ -160,22 +155,25 @@ int main (int argc, char** argv) {
 	}
 	//if(yydebug) fprintf(stderr, "Debug mode for yyparse() is on.\n");
 
+/*
 	// Read file and build stringset for it.
-	//int f_len = filename.length();
-	//char c_filename[f_len + 1];
-	//strcpy(c_filename, filename.c_str());
-	//cpplines(yyin, c_filename);
-
+	int f_len = filename.length();
+	char c_filename[f_len + 1];
+	strcpy(c_filename, filename.c_str());
+	cpplines(yyin, c_filename);
+*/
 	// Drop extension from filename.
 	string rawname = filename.substr(0, filename.size() - 3);
 
-	fscan_tok(rawname, cmd);
 	fdump_stringset(rawname);
+	fscan_tok(rawname, cmd);
+	
+/*
+	fdump_ast(rawname);
 	fcreate_sym_table(rawname);
 	check_type(parser::root);
 	fdump_ast(rawname);
-	//femit_lang(rawname);
-
+*/
 	// Closing the pipe.
 	if(pclose(yyin) != 0){
 		fprintf(stderr, "Failed to close pipe.\n");

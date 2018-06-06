@@ -11,7 +11,7 @@ GRIND     = valgrind --leak-check=full --show-reachable=yes
 FLEX      = flex --outfile=${LEXCPP}
 BISON     = bison --defines=${PARSEHDR} --output=${PARSECPP} --xml
 
-MODULES   = astree lyutils stringset auxlib symtable typechecker emitter
+MODULES   = lyutils stringset auxlib astree
 HDRSRC    = ${MODULES:=.h}
 CPPSRC    = ${MODULES:=.cpp} oc.cpp
 FLEXSRC   = scanner.l
