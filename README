@@ -1,7 +1,7 @@
 README
 Preston Fraser, pfraser
 
-* * * * * * PLEASE GRADE THIS SUBMISSION AS ASSIGNMENT 2 * * * * * *
+* * * * * * * PLEASE GRADE THIS SUBMISSION AS ASSIGNMENT 2 * * * * * * *
 
 I was not able to get the emitter to work without segmentation faults that
 would delete the entire .oil file, so I am resubmitting assignment 2 instead.

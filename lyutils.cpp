@@ -30,8 +30,6 @@ void lexer::newfilename (const string& filename) {
 }
 
 void lexer::advance() {
-   int a = YYEOF;
-   printf("%d\n", a);
    if (not interactive) {
       if (lexer::lloc.offset == 0) {
          printf (";%2zd.%3zd: ",

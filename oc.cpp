@@ -18,8 +18,6 @@
 #include "auxlib.h"
 #include "astree.h"
 #include "lyutils.h"
-//#include "symtable.h"
-//#include "typechecker.h"
 
 using namespace std;
 
@@ -58,7 +56,6 @@ void cpplines(FILE* pipe, const char* filename){
 
 		}
 		++line_num;
-
 	}
 }
 
@@ -79,25 +76,7 @@ void fscan_tok(string rawname, string cmd){
 	while(yylex() != YYEOF) {
 		yylval->dump_node(out);
 	}
-//	yyparse();
 }
-
-/*
-void fdump_ast(string rawname){
-	string fileout = rawname + ".ast";
-	FILE* ast = fopen(fileout.c_str(), "w");
-	astree::print(ast, parser::root);
-}
-
-void fcreate_sym_table(string rawname){
-	string fileout = rawname + ".sym";
-	FILE* sym = fopen(fileout.c_str(), "w");
-	vector<symtable*> sym_stack;
-	sym_stack.push_back(nullptr);
-	symtable structs;
-	symbol::parse_astree(sym, sym_stack, structs, parser::root);
-}
-*/
 
 int main (int argc, char** argv) {
 
@@ -111,7 +90,6 @@ int main (int argc, char** argv) {
 	yydebug = 0;
 
 	while((any_flags = getopt(argc, argv, "D:@:ly:")) != -1){
-		// fprintf(stdout, "flag: %d\n", any_flags);
 		if(any_flags == EOF) break;
 		switch(any_flags){
 			case 'D':	compflag = "-D " + (string) optarg + " ";	break;
@@ -153,7 +131,7 @@ int main (int argc, char** argv) {
 		fprintf (stderr, "-- popen (%s), fileno(yyin) = %d\n",
 				cmd.c_str(), fileno (yyin));
 	}
-	//if(yydebug) fprintf(stderr, "Debug mode for yyparse() is on.\n");
+	if(yydebug) fprintf(stderr, "Debug mode for yyparse() is on.\n");
 
 /*
 	// Read file and build stringset for it.
@@ -162,18 +140,13 @@ int main (int argc, char** argv) {
 	strcpy(c_filename, filename.c_str());
 	cpplines(yyin, c_filename);
 */
+
 	// Drop extension from filename.
 	string rawname = filename.substr(0, filename.size() - 3);
 
-	fdump_stringset(rawname);
 	fscan_tok(rawname, cmd);
-	
-/*
-	fdump_ast(rawname);
-	fcreate_sym_table(rawname);
-	check_type(parser::root);
-	fdump_ast(rawname);
-*/
+	fdump_stringset(rawname);
+
 	// Closing the pipe.
 	if(pclose(yyin) != 0){
 		fprintf(stderr, "Failed to close pipe.\n");
